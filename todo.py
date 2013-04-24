@@ -143,7 +143,7 @@ class TodoExtractor(object):
                 # patterns
                 for dir in exclude_dirs:
                     if dir in dirnames:
-                        self.log.debug(u'Ignoring dir: {0}'.format(dir))
+                        self.log.debug(u'SublimeTODO ignoring dir: {0}'.format(dir))
                         dirnames.remove(dir)
 
                 for filepath in filenames:
@@ -156,8 +156,9 @@ class TodoExtractor(object):
     def filter_files(self, files):
         """"""
         exclude_patterns = [re.compile(patt) for patt in self.ignored_files]
+
         for filepath in files:
-            if any(patt.match(filepath) for patt in exclude_patterns):
+            if any(patt.search(filepath) for patt in exclude_patterns):
                 continue
             yield filepath
 
@@ -174,7 +175,7 @@ class TodoExtractor(object):
         for filepath in self.search_targets():
             try:
                 f = open(filepath, 'r', encoding='utf-8')
-                self.log.debug(u'Scanning {0}'.format(filepath))
+                self.log.debug(u'SublimeTODO scanning {0}'.format(filepath))
                 for linenum, line in enumerate(f):
                     for mo in patt.finditer(line):
                         ## Remove the non-matched groups
