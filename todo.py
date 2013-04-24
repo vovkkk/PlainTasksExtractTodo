@@ -183,7 +183,7 @@ class TodoExtractor(object):
                                    msg in mo.groupdict().items() if msg]
                         for match in matches:
                             yield {'filepath': filepath, 'linenum': linenum + 1, 'match': match}
-            except IOError, UnicodeDecodeError:
+            except (IOError, UnicodeDecodeError):
                 ## Probably a broken symlink
                 f = None
             finally:
