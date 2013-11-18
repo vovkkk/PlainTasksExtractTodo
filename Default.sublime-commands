@@ -1,10 +1,4 @@
 [
-    {
-        "caption": "Show TODOs: Project and open files",
-        "command": "todo"
-    },
-    {
-        "caption": "Show TODOs: Open files only",
-        "command": "todo", "args": {"open_files_only": true}
-    }
+{"caption": "Extract TODOs: Project and open files", "command": "plain_tasks_extract_todo"},
+{"caption": "Extract TODOs: Open files only", "command": "plain_tasks_extract_todo", "args": {"open_files_only": true}}
 ]
