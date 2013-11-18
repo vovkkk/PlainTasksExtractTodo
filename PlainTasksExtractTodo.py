@@ -4,7 +4,7 @@ import functools
 import fnmatch
 from itertools import groupby
 from os import path, walk
-import re
+import re, io
 import threading
 import sublime
 import sublime_plugin
@@ -47,7 +47,7 @@ class PlainTasksThreadProgress(object):
 
 
 class PlainTasksTodoExtractor(object):
-    def __init__(self, settings, filepaths, dirpaths, ignored_dirs, ignored_file_patterns, file_counter):
+    def __init__(self, settings, filepaths, dirpaths, ignored_dirs, ignored_file_patterns, file_counter, case_sensitive):
         self.filepaths = filepaths
         self.dirpaths = dirpaths
         self.patterns = settings.get('patterns')
@@ -55,6 +55,7 @@ class PlainTasksTodoExtractor(object):
         self.file_counter = file_counter
         self.ignored_dirs = ignored_dirs
         self.ignored_files = ignored_file_patterns
+        self.case_sensitive = case_sensitive
 
     def iter_files(self):
         seen_paths_ = []
@@ -92,11 +93,11 @@ class PlainTasksTodoExtractor(object):
 
     def extract(self):
         message_patterns = '|'.join(self.patterns.values())
-        case_sensitivity = 0 if self.settings.get('case_sensitive', False) else re.IGNORECASE
+        case_sensitivity = 0 if self.case_sensitive else re.IGNORECASE
         patt = re.compile(message_patterns, case_sensitivity)
         for filepath in self.search_targets():
             try:
-                f = open(filepath, 'r', encoding='utf-8')
+                f = io.open(filepath, 'r', encoding='utf-8')
                 for linenum, line in enumerate(f):
                     for mo in patt.finditer(line):
                         matches = [Message(msg_type, msg) for msg_type, msg in mo.groupdict().items() if msg]
@@ -181,9 +182,10 @@ class PlainTasksExtractTodoCommand(sublime_plugin.TextCommand):
         exclude_file_patterns.extend(global_settings.get('file_exclude_patterns', []))
         exclude_file_patterns.extend(global_settings.get('binary_file_patterns', []))
         exclude_file_patterns = [fnmatch.translate(patt) for patt in exclude_file_patterns]
+        case_sensitive = settings.get('case_sensitive', False)
 
         file_counter = PlainTasksFileScanCounter()
-        extractor = PlainTasksTodoExtractor(settings, filepaths, dirpaths, ignored_dirs, exclude_file_patterns, file_counter)
+        extractor = PlainTasksTodoExtractor(settings, filepaths, dirpaths, ignored_dirs, exclude_file_patterns, file_counter, case_sensitive)
         worker_thread = PlainTasksWorkerThread(extractor, self.render_formatted, file_counter)
         worker_thread.start()
         PlainTasksThreadProgress(worker_thread, 'Finding TODOs', '', file_counter)

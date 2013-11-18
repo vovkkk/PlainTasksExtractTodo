@@ -15,7 +15,7 @@
             { "caption": "-" },
             {
               "command": "open_file",
-              "args": {"file": "${packages}/PlainTasksExtractTodo/PlainTasksExtractTodo.sublime-settings",},
+              "args": {"file": "${packages}/PlainTasksExtractTodo/PlainTasksExtractTodo.sublime-settings"},
               "caption": "Settings – Default"
             },
             {
